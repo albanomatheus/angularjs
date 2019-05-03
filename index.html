@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Lista Telefonica</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script src="lib/angular-1.6.10/angular.js"></script>
+	<script src="lib/jquery/jquery3.3.1.js"></script>
+	<script src="js/app.js"></script>
+	<script src="js/controllers/listaTelefonicaCtrl.js"></script>
+</head>
+<body ng-app="listaTelefonica">
+	<div ng-controller="listaTelefonicaCtrl" class="jumbotron">
+		<h4 ng-bind="app"></h4>
+		<input type="text" placeholder="Quem você está procurando?" class="form-control" ng-model="busca">
+		<input type="number" placeholder="Numero maximo de registros" class="form-control" ng-model="max">
+		<table class="table">
+			<tr>
+				<th>Deletar</th>
+				<th><a href="" ng-click="ordenarPor('nome')">Nome</a></th>
+				<th><a href="" ng-click="ordenarPor('telefone')">Telefone</a></th>
+				<th><a href="" ng-click="ordenarPor('operadora')">Operadora</a></th>
+				<th><a href="" ng-click="ordenarPor('data')">Data</a></th>
+			</tr>
+			<tr ng-repeat="x in contatos | filter:{nome: busca} | limitTo:max | orderBy:criterioDeOrdenacao:ordem">
+				<td><input type="checkbox" ng-model="x.selecionado"></td>
+				<td>{{x.nome}}</td>
+				<td>{{x.telefone}}</td>
+				<td>{{x.operadora.nome | lowercase}}</td>
+				<td>{{x.data | date: 'dd/mm/yyyy hh:mm'}}</td>
+			</tr>
+		</table>
+		<hr>
+		<form name="contatoForm">
+			<input class="form-control" type="text" placeholder="Nome" name="nome" ng-model="contato.nome">
+			<input class="form-control" type="text" placeholder="Telefone" name="telefone" ng-model="contato.telefone" ng-pattern="/^\d{4,5}-\d{4}$/">
+			<select class="form-control" ng-model="contato.operadora" ng-options="op.nome for op in operadoras | orderBy:'nome'" name="operadora">
+				<option value="">Selecione uma operadora</option>
+			</select>
+			<div class="alert alert-danger" ng-show="contatoForm.nome.$invalid && contatoForm.nome.$dirty">
+				Por favor, preencha o nome!
+			</div>
+			<div class="alert alert-danger" ng-show="contatoForm.telefone.$error.required && contatoForm.telefone.$dirty">
+				Por favor, preencha o telefone!
+			</div>
+			<div class="alert alert-danger" ng-show="contatoForm.telefone.$error.pattern">
+				O telefone não está no padrao esperado
+			</div>
+			<div class="alert alert-danger" ng-show="contatoForm.operadora.$error.required && contatoForm.operadora.$dirty">
+				Escolha uma operadora!
+			</div>
+			<button class="btn btn-primary btn-block" ng-click="addContato(contato)" ng-disabled="contatoForm.$invalid">Add</button>
+			<button class="btn btn-danger btn-block" ng-click="apagarContatos(contatos)" ng-disabled="!isSelecionado(contatos)">Apagar</button>
+		</form>
+	</div>
+</body>
+</html>
